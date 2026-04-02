@@ -1,557 +1,81 @@
-import React, { useMemo, useState } from "react";
-import {
-  Bell,
-  Menu,
-  User,
-  Home,
-  Wallet,
-  FileText,
-  LogOut,
-  Plus,
-  Search,
-  IndianRupee,
-  ShieldCheck,
-  MapPinned,
-  BadgeIndianRupee,
-  X,
-  CreditCard,
-  Clock3,
-  CheckCircle2,
-  Printer,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { motion, AnimatePresence } from "framer-motion";
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Print Portal</title>
 
-const menuItems = [
-  { label: "Dashboard", icon: Home, type: "base" },
-  { label: "Profile", icon: User, type: "base" },
-  { label: "Instant Wallet Load", icon: Wallet, type: "base" },
-  { label: "UP CASTE CERTIFICATE", icon: ShieldCheck, type: "service" },
-  { label: "UP INCOME CERTIFICATE", icon: BadgeIndianRupee, type: "service" },
-  { label: "UP DOMICILE CERTIFICATE", icon: MapPinned, type: "service" },
-  { label: "BIHAR RTPS CERTIFICATE", icon: FileText, type: "service" },
-  { label: "MP DOMICILE CERTIFICATE", icon: FileText, type: "service" },
-];
-
-const services = [
-  {
-    title: "UP CASTE CERTIFICATE",
-    subtitle: "Manual entry and print portal",
-    status: "Active",
-    forms: 12,
-  },
-  {
-    title: "UP INCOME CERTIFICATE",
-    subtitle: "Income application workflow",
-    status: "Active",
-    forms: 8,
-  },
-  {
-    title: "UP DOMICILE CERTIFICATE",
-    subtitle: "Domicile entry and print",
-    status: "Active",
-    forms: 5,
-  },
-  {
-    title: "BIHAR RTPS CERTIFICATE",
-    subtitle: "State RTPS service section",
-    status: "New",
-    forms: 4,
-  },
-];
-
-const recentApplications = [
-  { id: "UPI24001", name: "Ravi Kumar", service: "Income", status: "Approved" },
-  { id: "UPC24002", name: "Aman Singh", service: "Caste", status: "Pending" },
-  { id: "UPD24003", name: "Pooja Devi", service: "Domicile", status: "Printed" },
-  { id: "BRT24004", name: "Sonu", service: "RTPS", status: "Pending" },
-];
-
-export default function EDistrictStyleAdminPanel() {
-  const [showLogin, setShowLogin] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(true);
-  const [selected, setSelected] = useState("Dashboard");
-  const [query, setQuery] = useState("");
-  const [formData, setFormData] = useState({
-    service: "UP INCOME CERTIFICATE",
-    applicant: "",
-    father: "",
-    mobile: "",
-    aadhaar: "",
-    address: "",
-  });
-  const [applications, setApplications] = useState(recentApplications);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedApp, setSelectedApp] = useState(null);
-
-  const handleChange = (key, value) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const saveApplication = () => {
-    const prefix = formData.service.includes("INCOME")
-      ? "UPI"
-      : formData.service.includes("CASTE")
-      ? "UPC"
-      : formData.service.includes("DOMICILE")
-      ? "UPD"
-      : "APP";
-
-    const newApp = {
-      id: `${prefix}${String(applications.length + 24001)}`,
-      name: formData.applicant || "New Applicant",
-      service: formData.service.replace("UP ", "").replace(" CERTIFICATE", ""),
-      status: "Pending",
-      father: formData.father,
-      mobile: formData.mobile,
-      aadhaar: formData.aadhaar,
-      address: formData.address,
-    };
-
-    setApplications((prev) => [newApp, ...prev]);
-    setSelectedApp(newApp);
-  };
-
-  const filteredApplications = applications.filter((row) => {
-    const hay = `${row.id} ${row.name} ${row.service} ${row.status} ${row.mobile || ""}`.toLowerCase();
-    return hay.includes(searchTerm.toLowerCase());
-  });
-
-  const printCertificate = () => {
-    window.print();
-  };
-
-  const filteredServices = useMemo(() => {
-    if (!query.trim()) return services;
-    return services.filter((item) =>
-      `${item.title} ${item.subtitle}`.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [query]);
-
-  if (showLogin) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-violet-900 to-indigo-900 p-4">
-        <Card className="w-full max-w-md rounded-[2rem] border-0 bg-white/95 shadow-2xl">
-          <CardHeader className="pb-2 text-center">
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl bg-violet-700 text-white shadow-lg">
-              <FileText className="h-7 w-7" />
-            </div>
-            <CardTitle className="text-2xl">Operator Login</CardTitle>
-            <p className="text-sm text-slate-600">eDistrict style certificate portal access</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">User ID</label>
-              <Input placeholder="Enter user id" className="rounded-2xl" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Password</label>
-              <Input type="password" placeholder="Enter password" className="rounded-2xl" />
-            </div>
-            <Button onClick={() => setShowLogin(false)} className="w-full rounded-2xl bg-violet-700 hover:bg-violet-800">
-              Login to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="flex min-h-screen">
-        <AnimatePresence>
-          {drawerOpen && (
-            <motion.aside
-              initial={{ x: -40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -40, opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              className="fixed inset-y-0 left-0 z-50 w-[310px] overflow-y-auto border-r border-slate-200 bg-gradient-to-b from-slate-100 via-sky-100 to-sky-400 shadow-2xl lg:static"
-            >
-              <div className="flex items-center justify-between bg-black px-5 py-4 text-white">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-700 shadow-lg shadow-violet-700/40">
-                    <FileText className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/60">Portal</p>
-                    <h2 className="text-lg font-semibold">eDistrict Panel</h2>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10 lg:hidden"
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-
-              <div className="px-5 py-6">
-                <div className="mb-6 flex items-center gap-3 rounded-3xl bg-white/60 p-4 shadow-sm backdrop-blur">
-                  <Avatar className="h-16 w-16 border-2 border-white shadow">
-                    <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop" />
-                    <AvatarFallback>MK</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-800">Mukesh Kumar</h3>
-                    <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Operator</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {menuItems.map((item) => {
-                    const Icon = item.icon;
-                    const active = selected === item.label;
-                    return (
-                      <button
-                        key={item.label}
-                        onClick={() => setSelected(item.label)}
-                        className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition-all ${
-                          active ? "bg-white text-slate-900 shadow-lg" : "text-slate-800 hover:bg-white/60"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="rounded-xl bg-violet-700 p-2 text-white shadow-sm">
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <span className="text-lg font-medium leading-tight">{item.label}</span>
-                        </div>
-                        {item.type === "service" ? <Plus className="h-4 w-4 text-slate-500" /> : null}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button className="mt-6 flex w-full items-center gap-3 rounded-2xl bg-white/60 px-4 py-3 text-left text-lg font-medium text-slate-800 shadow-sm hover:bg-white">
-                  <div className="rounded-xl bg-violet-700 p-2 text-white">
-                    <LogOut className="h-5 w-5" />
-                  </div>
-                  Signout
-                </button>
-              </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
-
-        <div className="flex-1">
-          <header className="sticky top-0 z-40 bg-black text-white shadow-sm">
-            <div className="flex items-center justify-between px-4 py-4 md:px-6">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10"
-                  onClick={() => setDrawerOpen((v) => !v)}
-                >
-                  <Menu className="h-6 w-6" />
-                </Button>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white/60">Dashboard View</p>
-                  <h1 className="text-xl font-semibold">{selected}</h1>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="relative hidden md:block">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search service..."
-                    className="w-[260px] rounded-2xl border-0 bg-white pl-9 text-slate-900"
-                  />
-                </div>
-                <button className="relative rounded-full bg-white/10 p-3 hover:bg-white/15">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold">
-                    7
-                  </span>
-                </button>
-                <Avatar className="h-10 w-10 border border-white/20">
-                  <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop" />
-                  <AvatarFallback>MK</AvatarFallback>
-                </Avatar>
-              </div>
-            </div>
-          </header>
-
-          <main className="p-4 md:p-6">
-            <div className="mb-5 md:hidden">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search service..."
-                  className="rounded-2xl border-0 bg-white pl-9 text-slate-900 shadow"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center justify-between text-base font-semibold">
-                    Wallet Balance
-                    <Badge className="rounded-full bg-pink-500 px-3 py-1 text-white hover:bg-pink-500">
-                      WALLET
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-1 text-4xl font-bold text-slate-800">
-                    <IndianRupee className="h-8 w-8" />0
-                  </div>
-                  <Button className="mt-4 rounded-2xl bg-white text-slate-900 shadow ring-1 ring-slate-200 hover:bg-slate-50">
-                    Add Money
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold text-cyan-600">Notification Center</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-slate-600">Certificate service updates and operator alerts show here.</p>
-                  <div className="mt-4 rounded-2xl bg-cyan-50 p-3 text-sm font-medium text-cyan-700">
-                    7 new notifications available
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="rounded-3xl border-0 bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-lg shadow-indigo-300/50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold">Quick Access</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button className="w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
-                    New Application
-                  </Button>
-                  <Button className="w-full rounded-2xl bg-white/10 hover:bg-white/15">
-                    Search Record
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mt-6 grid gap-4 lg:grid-cols-[1.25fr,0.75fr]">
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl">Certificate Services</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {filteredServices.map((item) => (
-                      <div key={item.title} className="rounded-3xl border border-slate-100 bg-slate-50 p-4 shadow-sm">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h3 className="text-lg font-semibold text-slate-800">{item.title}</h3>
-                            <p className="mt-1 text-sm text-slate-600">{item.subtitle}</p>
-                          </div>
-                          <Badge className="rounded-full bg-violet-600 text-white hover:bg-violet-600">
-                            {item.status}
-                          </Badge>
-                        </div>
-                        <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
-                          <span>{item.forms} pending forms</span>
-                          <Button size="sm" className="rounded-xl bg-slate-900 hover:bg-slate-800">
-                            Open
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-4">
-                <Card className="rounded-3xl border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Portal Stats</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-emerald-100 p-2 text-emerald-700"><CheckCircle2 className="h-5 w-5" /></div>
-                        <span>Approved</span>
-                      </div>
-                      <strong>124</strong>
-                    </div>
-                    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-amber-100 p-2 text-amber-700"><Clock3 className="h-5 w-5" /></div>
-                        <span>Pending</span>
-                      </div>
-                      <strong>29</strong>
-                    </div>
-                    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-sky-100 p-2 text-sky-700"><Printer className="h-5 w-5" /></div>
-                        <span>Printed</span>
-                      </div>
-                      <strong>76</strong>
-                    </div>
-                    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-fuchsia-100 p-2 text-fuchsia-700"><CreditCard className="h-5 w-5" /></div>
-                        <span>Wallet Txn</span>
-                      </div>
-                      <strong>18</strong>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <div className="mt-6 grid gap-4 lg:grid-cols-[1fr,1fr]">
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl">Certificate Entry Form</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-slate-700">Service Type</label>
-                      <Input value={formData.service} onChange={(e) => handleChange("service", e.target.value)} className="rounded-2xl" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">Applicant Name</label>
-                      <Input value={formData.applicant} onChange={(e) => handleChange("applicant", e.target.value)} placeholder="Enter applicant name" className="rounded-2xl" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">Father Name</label>
-                      <Input value={formData.father} onChange={(e) => handleChange("father", e.target.value)} placeholder="Enter father name" className="rounded-2xl" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">Mobile Number</label>
-                      <Input value={formData.mobile} onChange={(e) => handleChange("mobile", e.target.value)} placeholder="Enter mobile number" className="rounded-2xl" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">Aadhaar Number</label>
-                      <Input value={formData.aadhaar} onChange={(e) => handleChange("aadhaar", e.target.value)} placeholder="Enter Aadhaar number" className="rounded-2xl" />
-                    </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-slate-700">Address</label>
-                      <Input value={formData.address} onChange={(e) => handleChange("address", e.target.value)} placeholder="Enter full address" className="rounded-2xl" />
-                    </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <Button onClick={saveApplication} className="rounded-2xl bg-violet-700 hover:bg-violet-800">Save Application</Button>
-                    <Button variant="outline" className="rounded-2xl">Upload Document</Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="rounded-3xl border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-xl">Print Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-800">Application Summary</h3>
-                        <p className="text-sm text-slate-500">Print-ready certificate application preview</p>
-                      </div>
-                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Ready</Badge>
-                    </div>
-                    <div className="space-y-3 text-sm text-slate-700">
-                      <div className="flex justify-between gap-4 border-b pb-2"><span>Application ID</span><strong>{selectedApp?.id || "Auto on save"}</strong></div>
-                      <div className="flex justify-between gap-4 border-b pb-2"><span>Service</span><strong>{formData.service || "-"}</strong></div>
-                      <div className="flex justify-between gap-4 border-b pb-2"><span>Applicant</span><strong>{formData.applicant || "-"}</strong></div>
-                      <div className="flex justify-between gap-4 border-b pb-2"><span>Father</span><strong>{formData.father || "-"}</strong></div>
-                      <div className="flex justify-between gap-4 border-b pb-2"><span>Mobile</span><strong>{formData.mobile || "-"}</strong></div>
-                      <div className="flex justify-between gap-4 border-b pb-2"><span>Aadhaar</span><strong>{formData.aadhaar || "-"}</strong></div>
-                      <div className="flex justify-between gap-4"><span>Address</span><strong className="text-right">{formData.address || "-"}</strong></div>
-                    </div>
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      <Button onClick={printCertificate} className="rounded-2xl bg-slate-900 hover:bg-slate-800">Print Certificate</Button>
-                      <Button variant="outline" className="rounded-2xl">Download PDF</Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="mt-6 rounded-3xl border-0 shadow-lg">
-              <CardHeader>
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <CardTitle className="text-xl">Recent Applications</CardTitle>
-                  <div className="relative w-full md:w-[320px]">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <Input
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search by ID, name, mobile"
-                      className="rounded-2xl pl-9"
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[600px] text-left">
-                    <thead>
-                      <tr className="border-b text-sm text-slate-500">
-                        <th className="px-3 py-3 font-medium">Application ID</th>
-                        <th className="px-3 py-3 font-medium">Applicant Name</th>
-                        <th className="px-3 py-3 font-medium">Service</th>
-                        <th className="px-3 py-3 font-medium">Status</th>
-                        <th className="px-3 py-3 font-medium">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredApplications.map((row) => (
-                        <tr key={row.id} className="border-b last:border-0">
-                          <td className="px-3 py-4 font-medium text-slate-800">{row.id}</td>
-                          <td className="px-3 py-4 text-slate-700">{row.name}</td>
-                          <td className="px-3 py-4 text-slate-700">{row.service}</td>
-                          <td className="px-3 py-4">
-                            <Badge
-                              className={`rounded-full px-3 py-1 text-white hover:opacity-100 ${
-                                row.status === "Approved"
-                                  ? "bg-emerald-600"
-                                  : row.status === "Pending"
-                                  ? "bg-amber-500"
-                                  : "bg-sky-600"
-                              }`}
-                            >
-                              {row.status}
-                            </Badge>
-                          </td>
-                          <td className="px-3 py-4">
-                            <Button size="sm" onClick={() => {
-                              setSelectedApp(row);
-                              setFormData({
-                                service: row.service.includes("INCOME") ? "UP INCOME CERTIFICATE" : row.service.includes("CASTE") ? "UP CASTE CERTIFICATE" : row.service.includes("DOMICILE") ? "UP DOMICILE CERTIFICATE" : row.service,
-                                applicant: row.name || "",
-                                father: row.father || "",
-                                mobile: row.mobile || "",
-                                aadhaar: row.aadhaar || "",
-                                address: row.address || "",
-                              });
-                            }} className="rounded-xl bg-slate-900 hover:bg-slate-800">
-                              View
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </main>
-        </div>
-      </div>
-    </div>
-  );
+<style>
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+  text-align: center;
 }
+
+.container {
+  background: white;
+  padding: 20px;
+  margin: 50px auto;
+  width: 350px;
+  border-radius: 10px;
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button {
+  padding: 10px;
+  background: #6a0dad;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.preview {
+  margin-top: 20px;
+  border: 1px dashed #aaa;
+  padding: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+<h2>Certificate Portal</h2>
+
+<input type="text" id="name" placeholder="Applicant Name">
+<input type="text" id="father" placeholder="Father Name">
+<input type="text" id="mobile" placeholder="Mobile">
+
+<button onclick="save()">Save</button>
+
+<div class="preview" id="preview">
+No Data
+</div>
+
+<button onclick="printPage()">Print</button>
+
+</div>
+
+<script>
+function save() {
+  let name = document.getElementById("name").value;
+  let father = document.getElementById("father").value;
+  let mobile = document.getElementById("mobile").value;
+
+  document.getElementById("preview").innerHTML =
+    "Name: " + name + "<br>Father: " + father + "<br>Mobile: " + mobile;
+}
+
+function printPage() {
+  window.print();
+}
+</script>
+
+</body>
+</html>
